@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sustainable Resource Management Panel — GTU</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+</head>
+<body>
+<style>
+
+  :root{
+    --bg: #EEF2EA;
+    --panel: #FFFFFF;
+    --ink: #1C2B22;
+    --ink-soft: #52645A;
+    --line: #DCE3D6;
+    --primary: #2F5233;
+    --primary-dark: #1E3A22;
+    --accent: #A9762F;
+    --c-air: #395E78;
+    --c-water: #2C6E8C;
+    --c-waste: #6E7A3F;
+  }
+  *{box-sizing:border-box;}
+  body{
+    font-family:'IBM Plex Sans', sans-serif;
+    color:var(--ink);
+    line-height:1.55;
+    padding: 28px 20px 40px;
+    background: var(--bg);
+  }
+  .wrap{max-width:1080px;margin:0 auto;}
+
+  .masthead{
+    border-bottom:1px solid var(--line);
+    padding-bottom:18px; margin-bottom:20px;
+  }
+  .masthead h1{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:clamp(20px, 2.6vw, 28px);
+    margin:0 0 6px;
+    letter-spacing:-0.01em;
+  }
+  .masthead .tag{ font-size:13px; color:var(--ink-soft); }
+
+  .data-scope{
+    display:inline-flex; align-items:center; gap:8px;
+    font-size:12px; font-weight:500;
+    color:var(--primary-dark);
+    background:#E5ECE1;
+    border:1px solid #CBDAC4;
+    padding:5px 12px;
+    border-radius:20px;
+    margin-top:12px;
+  }
+
+  .intro{
+    font-size:14.5px; line-height:1.65; color:var(--ink);
+    max-width:74ch; margin-bottom:14px;
+  }
+
+  .demo-note{
+    display:flex; gap:10px; align-items:flex-start;
+    background:#F5F7F2; border:1px solid var(--line); border-radius:6px;
+    padding:12px 14px; font-size:12.5px; color:var(--ink-soft);
+    margin-bottom:24px;
+  }
+
+  .tabs{ display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap; }
+  .tab-btn{
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:13.5px; font-weight:500;
+    padding:9px 16px; border-radius:20px;
+    border:1px solid var(--line); background:var(--panel);
+    color:var(--ink-soft); cursor:pointer;
+  }
+  .tab-btn.active{ background:var(--primary); border-color:var(--primary); color:#fff; }
+
+  .grid2{
+    display:grid; grid-template-columns: minmax(260px, 380px) 1fr;
+    gap:20px;
+  }
+  @media (max-width:760px){ .grid2{ grid-template-columns:1fr; } }
+
+  .panel{
+    background:var(--panel); border:1px solid var(--line); border-radius:6px; padding:20px;
+  }
+  .panel h2{
+    font-size:13px; font-weight:600; color:var(--ink-soft);
+    margin:0 0 16px; padding-bottom:10px; border-bottom:1px solid var(--line);
+  }
+
+  .field{ margin-bottom:14px; }
+  .field label{ display:block; font-size:12.5px; font-weight:500; margin-bottom:5px; }
+  .field select, .field input, .field textarea{
+    width:100%; font-family:'IBM Plex Sans', sans-serif; font-size:14px;
+    padding:8px 10px; border:1px solid #C6D0BF; border-radius:4px; background:#FCFDFB; color:var(--ink);
+  }
+  .field textarea{ resize:vertical; min-height:56px; }
+  .field .unit-hint{ font-size:11.5px; color:var(--ink-soft); margin-top:4px; }
+
+  .save-btn{
+    width:100%; padding:10px; font-size:14px; font-weight:600;
+    background:var(--primary); color:#fff; border:none; border-radius:4px; cursor:pointer;
+  }
+  .save-btn:hover{ background:var(--primary-dark); }
+
+  .toast{
+    display:none; margin-top:10px; padding:8px 10px; border-radius:4px;
+    background:#E5ECE1; border:1px solid #CBDAC4; color:var(--primary-dark); font-size:12.5px;
+  }
+
+  .entries-table{
+    width:100%; border-collapse:collapse; font-size:13px;
+  }
+  .entries-table th, .entries-table td{
+    padding:8px 10px; text-align:left; border-bottom:1px solid var(--line);
+  }
+  .entries-table th{ font-size:11.5px; color:var(--ink-soft); font-weight:600; }
+  .entries-table td.num{ font-family:'IBM Plex Mono', monospace; }
+  .entries-table tbody tr:hover{ background:#FAFBF9; }
+
+  .summary-row{ display:grid; grid-template-columns:repeat(auto-fit, minmax(150px,1fr)); gap:10px; margin-bottom:18px; }
+  .summary-card{ background:#F5F7F2; border:1px solid var(--line); border-radius:6px; padding:12px; }
+  .summary-card .label{ font-size:11px; color:var(--ink-soft); margin-bottom:4px; }
+  .summary-card .value{ font-family:'Fraunces', serif; font-weight:600; font-size:20px; color:var(--primary-dark); }
+
+  .empty-state{ font-size:13px; color:var(--ink-soft); padding:20px 0; text-align:center; }
+
+  .credit-note{
+    font-size:11.5px; color:var(--ink-soft);
+    border-top:1px solid var(--line); padding-top:12px; margin-top:24px;
+  }
+  .credit-note strong{ color:var(--ink); font-weight:500; }
+</style>
+
+<div class="wrap">
+
+  <div class="masthead">
+    <h1>Sustainable Resource Management Panel</h1>
+    <div class="tag">Air Quality, Water Quality and Waste monitoring in a single panel — Student Projects</div>
+    <span class="data-scope">📊 Project completed in 2025</span>
+  </div>
+
+  <p class="intro">
+    This panel is a multi-module data console designed to let air quality, water quality, and waste data across campus be entered and monitored from one place. Select a measurement point (building), a measurement type and a value, save it, and the data appears instantly in the table and summary cards below.
+  </p>
+
+  <div class="demo-note">
+    ⚠️ <span><strong>Demo mode:</strong> This panel runs entirely in the browser (client-side) to demonstrate the project's planned data model — it is not connected to a central database. Data you enter is only visible while this page is open and resets when the page is refreshed.</span>
+  </div>
+
+  <div class="tabs" id="moduleTabs"></div>
+
+  <div class="grid2">
+    <div class="panel">
+      <h2>New Measurement Entry</h2>
+      <div class="field">
+        <label for="locSelect">Measurement Point</label>
+        <select id="locSelect">
+          <option>Molecular Biology and Genetics</option>
+          <option>Library</option>
+          <option>Chemistry Department</option>
+          <option>Central Lecture Hall</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="dateInput">Date and Time</label>
+        <input type="datetime-local" id="dateInput">
+      </div>
+      <div class="field">
+        <label for="typeSelect">Measurement Type</label>
+        <select id="typeSelect"></select>
+      </div>
+      <div class="field">
+        <label for="valueInput">Value</label>
+        <input type="number" step="any" id="valueInput" placeholder="e.g. 42.5">
+        <div class="unit-hint" id="unitHint">Unit: —</div>
+      </div>
+      <div class="field">
+        <label for="notesInput">Notes (optional)</label>
+        <textarea id="notesInput" placeholder="e.g. Morning measurement, clear skies"></textarea>
+      </div>
+      <button class="save-btn" id="saveBtn">Save</button>
+      <div class="toast" id="toast">✓ Record added.</div>
+    </div>
+
+    <div class="panel">
+      <h2>Summary</h2>
+      <div class="summary-row" id="summaryRow"></div>
+      <h2>Recent Records</h2>
+      <div id="tableWrap"></div>
+    </div>
+  </div>
+
+  <div class="credit-note">
+    Computer Engineering Student <strong>Çağatay Çakır</strong>, Computer Engineering Student <strong>Selim Eren Kavalcı</strong>, Computer Engineering Student <strong>İlkay Bolat</strong><br>
+    The Energy Efficiency Module is covered on a separate sub-page (Carbon Footprint Calculation Module).
+  </div>
+</div>
+
+<script>
+(function(){
+  var MODULES = {
+    air: {
+      label: 'Air Quality', icon: '🍃',
+      types: [
+        { id:'pm25', label:'PM2.5', unit:'µg/m³', min:0.01, max:200 },
+        { id:'pm10', label:'PM10', unit:'µg/m³', min:0.01, max:200 },
+        { id:'ozone', label:'Ozone (O₃)', unit:'ppm', min:0.01, max:200 },
+        { id:'co', label:'Carbon Monoxide (CO)', unit:'ppm', min:0.01, max:200 },
+        { id:'so2', label:'Sulfur Dioxide (SO₂)', unit:'ppb', min:0.01, max:200 },
+        { id:'no2', label:'Nitrogen Dioxide (NO₂)', unit:'ppb', min:0.01, max:200 }
+      ]
+    },
+    water: {
+      label: 'Water Quality', icon: '💧',
+      types: [
+        { id:'ph', label:'pH Level', unit:'pH', min:6.5, max:8.5 },
+        { id:'do', label:'Dissolved Oxygen', unit:'mg/L', min:0.01, max:14 },
+        { id:'turbidity', label:'Turbidity', unit:'NTU', min:0.01, max:14 },
+        { id:'lead', label:'Lead', unit:'µg/L', min:0.01, max:14 },
+        { id:'mercury', label:'Mercury', unit:'µg/L', min:0.01, max:14 }
+      ]
+    },
+    waste: {
+      label: 'Waste Management', icon: '♻️',
+      types: [
+        { id:'plastic', label:'Plastic', unit:'kg', min:1, max:500 },
+        { id:'paper', label:'Paper', unit:'kg', min:1, max:500 },
+        { id:'glass', label:'Glass', unit:'kg', min:1, max:500 },
+        { id:'metal', label:'Metal', unit:'kg', min:1, max:500 },
+        { id:'organic', label:'Organic', unit:'kg', min:1, max:500 }
+      ]
+    }
+  };
+
+  var LOCATIONS = ['Molecular Biology and Genetics', 'Library', 'Chemistry Department', 'Central Lecture Hall'];
+
+  var records = { air: [], water: [], waste: [] };
+
+  function randBetween(a, b){ return Math.round((a + Math.random() * (b - a)) * 100) / 100; }
+  function randDate(daysBack){
+    var d = new Date();
+    d.setDate(d.getDate() - Math.floor(Math.random() * daysBack));
+    return d;
+  }
+  function seed(){
+    Object.keys(MODULES).forEach(function(modKey){
+      var types = MODULES[modKey].types;
+      for (var i = 0; i < 8; i++){
+        var t = types[Math.floor(Math.random() * types.length)];
+        records[modKey].push({
+          date: randDate(7),
+          location: LOCATIONS[Math.floor(Math.random() * LOCATIONS.length)],
+          type: t.id, typeLabel: t.label,
+          value: randBetween(t.min, t.max), unit: t.unit,
+          notes: ''
+        });
+      }
+    });
+  }
+  seed();
+
+  var activeModule = 'air';
+
+  var tabsEl = document.getElementById('moduleTabs');
+  var typeSelect = document.getElementById('typeSelect');
+  var unitHint = document.getElementById('unitHint');
+  var locSelect = document.getElementById('locSelect');
+  var dateInput = document.getElementById('dateInput');
+  var valueInput = document.getElementById('valueInput');
+  var notesInput = document.getElementById('notesInput');
+  var saveBtn = document.getElementById('saveBtn');
+  var toast = document.getElementById('toast');
+  var summaryRow = document.getElementById('summaryRow');
+  var tableWrap = document.getElementById('tableWrap');
+
+  function fmtNum(n){
+    return n.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+  }
+  function fmtDate(d){
+    return d.toLocaleDateString('en-US') + ' ' + d.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'});
+  }
+
+  function renderTabs(){
+    tabsEl.innerHTML = '';
+    Object.keys(MODULES).forEach(function(key){
+      var btn = document.createElement('button');
+      btn.className = 'tab-btn' + (key === activeModule ? ' active' : '');
+      btn.textContent = MODULES[key].icon + ' ' + MODULES[key].label;
+      btn.addEventListener('click', function(){
+        activeModule = key;
+        renderAll();
+      });
+      tabsEl.appendChild(btn);
+    });
+  }
+
+  function renderTypeOptions(){
+    typeSelect.innerHTML = '';
+    MODULES[activeModule].types.forEach(function(t){
+      var opt = document.createElement('option');
+      opt.value = t.id;
+      opt.textContent = t.label;
+      typeSelect.appendChild(opt);
+    });
+    updateUnitHint();
+  }
+
+  function updateUnitHint(){
+    var t = MODULES[activeModule].types.find(function(x){ return x.id === typeSelect.value; });
+    unitHint.textContent = t ? ('Unit: ' + t.unit + ' · typical range: ' + t.min + '–' + t.max) : 'Unit: —';
+  }
+
+  function renderSummary(){
+    var list = records[activeModule];
+    summaryRow.innerHTML = '';
+    var totalCard = document.createElement('div');
+    totalCard.className = 'summary-card';
+    totalCard.innerHTML = '<div class="label">Total Records</div><div class="value">' + list.length + '</div>';
+    summaryRow.appendChild(totalCard);
+
+    MODULES[activeModule].types.forEach(function(t){
+      var vals = list.filter(function(r){ return r.type === t.id; }).map(function(r){ return r.value; });
+      if (vals.length === 0) return;
+      var avg = vals.reduce(function(a,b){ return a+b; }, 0) / vals.length;
+      var card = document.createElement('div');
+      card.className = 'summary-card';
+      card.innerHTML = '<div class="label">' + t.label + ' (avg.)</div><div class="value">' + fmtNum(avg) + '</div>';
+      summaryRow.appendChild(card);
+    });
+  }
+
+  function renderTable(){
+    var list = records[activeModule].slice().sort(function(a,b){ return b.date - a.date; }).slice(0, 10);
+    if (list.length === 0){
+      tableWrap.innerHTML = '<div class="empty-state">No records yet.</div>';
+      return;
+    }
+    var html = '<table class="entries-table"><thead><tr>' +
+      '<th>Date</th><th>Point</th><th>Type</th><th>Value</th><th>Notes</th>' +
+      '</tr></thead><tbody>';
+    list.forEach(function(r){
+      html += '<tr>' +
+        '<td>' + fmtDate(r.date) + '</td>' +
+        '<td>' + r.location + '</td>' +
+        '<td>' + r.typeLabel + '</td>' +
+        '<td class="num">' + fmtNum(r.value) + ' ' + r.unit + '</td>' +
+        '<td>' + (r.notes || '—') + '</td>' +
+        '</tr>';
+    });
+    html += '</tbody></table>';
+    tableWrap.innerHTML = html;
+  }
+
+  function renderAll(){
+    renderTabs();
+    renderTypeOptions();
+    renderSummary();
+    renderTable();
+  }
+
+  typeSelect.addEventListener('change', updateUnitHint);
+
+  saveBtn.addEventListener('click', function(){
+    var t = MODULES[activeModule].types.find(function(x){ return x.id === typeSelect.value; });
+    var val = parseFloat(valueInput.value);
+    if (!val && val !== 0){
+      valueInput.focus();
+      return;
+    }
+    var d = dateInput.value ? new Date(dateInput.value) : new Date();
+    records[activeModule].push({
+      date: d,
+      location: locSelect.value,
+      type: t.id, typeLabel: t.label,
+      value: val, unit: t.unit,
+      notes: notesInput.value.trim()
+    });
+    valueInput.value = '';
+    notesInput.value = '';
+    toast.style.display = 'block';
+    setTimeout(function(){ toast.style.display = 'none'; }, 2500);
+    renderSummary();
+    renderTable();
+  });
+
+  (function(){
+    var now = new Date();
+    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+    dateInput.value = now.toISOString().slice(0,16);
+  })();
+
+  renderAll();
+})();
+</script>
+</body>
+</html>
